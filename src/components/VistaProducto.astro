@@ -19,10 +19,12 @@ const {
 const { Content } = await render(producto);
 const modalId = `modal-${producto.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 
+const tienePromo = Boolean(producto.data.promocion && producto.data.promocion !== 'ninguna');
 const precioFinal = producto.data.precioDescuento && producto.data.precioDescuento < producto.data.precio 
     ? producto.data.precioDescuento 
     : producto.data.precio;
-const mensaje = `Hola, me interesa el producto "${producto.data.nombre}" que cuesta $${precioFinal}. ¿Aún está disponible?`;
+const textoPromoWhatsApp = tienePromo ? ` (Promoción ${producto.data.promocion})` : '';
+const mensaje = `Hola, me interesa el producto "${producto.data.nombre}"${textoPromoWhatsApp} que cuesta $${precioFinal}. ¿Aún está disponible?`;
 const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(mensaje)}`;
 ---
 
@@ -40,11 +42,18 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
             <!-- Columna Izquierda: Galería Interactiva -->
             <div class="flex flex-col gap-3 galeria-producto">
-                <Image 
-                    src={producto.data.imagenPrincipal} 
-                    alt={producto.data.nombre} 
-                    class="img-principal rounded-2xl shadow-lg w-full object-cover aspect-square transition-opacity duration-300"
-                />
+                <div class="relative">
+                    <Image 
+                        src={producto.data.imagenPrincipal} 
+                        alt={producto.data.nombre} 
+                        class="img-principal rounded-2xl shadow-lg w-full object-cover aspect-square transition-opacity duration-300"
+                    />
+                    {tienePromo && (
+                        <span class="badge badge-warning badge-lg font-extrabold absolute top-3 right-3 shadow-md">
+                            ¡Promo {producto.data.promocion}!
+                        </span>
+                    )}
+                </div>
                 {producto.data.imagenesSecundarias && (
                     <div class="flex gap-2 overflow-x-auto pb-2">
                         <button type="button" class="miniatura-btn border-2 border-primary rounded-lg overflow-hidden flex-shrink-0 opacity-100">
@@ -73,6 +82,9 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
                     {producto.data.destacado && (
                         <span class="badge badge-accent">¡Destacado!</span>
                     )}
+                    {tienePromo && (
+                        <span class="badge badge-warning font-bold">¡{producto.data.promocion}!</span>
+                    )}
                     {producto.data.categorias.map((cat: string) => (
                         <a href={`/productos?categoria=${encodeURIComponent(cat)}`} class="badge badge-primary">{cat}</a>
                     ))}
@@ -86,7 +98,7 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
 
                 <h2 class="text-2xl md:text-3xl font-bold mb-3">{producto.data.nombre}</h2>
 
-                <div class="flex items-end gap-3 mb-4">
+                <div class="flex items-end flex-wrap gap-3 mb-4">
                     {producto.data.precioDescuento && producto.data.precioDescuento < producto.data.precio ? (
                         <>
                             <p class="text-3xl font-bold text-error">${producto.data.precioDescuento}</p>
@@ -97,6 +109,11 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
                         </>
                     ) : (
                         <p class="text-3xl font-bold text-primary">${producto.data.precio}</p>
+                    )}
+                    {tienePromo && (
+                        <div class="badge badge-warning badge-lg font-extrabold mb-1">
+                            Promoción {producto.data.promocion}
+                        </div>
                     )}
                 </div>
 
@@ -134,8 +151,7 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
             </form>
         </div>
     </div>
-
-    <!-- Cerrar al hacer clic fuera del modal -->
+<!-- Cerrar al hacer clic fuera del modal -->
     <form method="dialog" class="modal-backdrop">
         <button>close</button>
     </form>

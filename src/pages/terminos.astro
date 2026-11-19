@@ -1,8 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { SITE_TITLE } from '../consts';
+import { SITE_PROPIETARIO, SITE_TITLE } from '../consts';
 ---
-<Layout title={`Términos y Condiciones | ${SITE_TITLE}`} description="Términos de servicio y políticas de uso de nuestra tienda.">
+<Layout title={`Términos y Condiciones | ${SITE_TITLE}`} description="Términos de servicio, políticas de pedidos, promociones y entregas de nuestro menú.">
     <main class="container mx-auto px-4 py-12">
         <article class="prose prose-base md:prose-lg max-w-4xl mx-auto bg-base-100 p-8 md:p-16 rounded-3xl shadow-xl border border-base-200">
             <div class="text-center mb-10">
@@ -11,33 +11,38 @@ import { SITE_TITLE } from '../consts';
             </div>
             <h2>1. Información General</h2>
             <p>
-                Bienvenido a <strong>{SITE_TITLE}</strong>. Los presentes Términos y Condiciones regulan el uso de nuestro sitio web y la adquisición de productos a través del mismo. Al acceder a esta plataforma, aceptas estar sujeto a estas políticas. Te recomendamos leerlas detenidamente antes de realizar cualquier compra.
+                Bienvenido a <strong>{SITE_TITLE}</strong>. Los presentes Términos y Condiciones regulan el uso de nuestro menú digital y la solicitud de pedidos a través de nuestra plataforma y canales de contacto (como WhatsApp). Al consultar nuestro catálogo o realizar un pedido, aceptas estar sujeto a estas políticas.
             </p>
-            <h2>2. Productos y Disponibilidad</h2>
+            <h2>2. Platillos, Imágenes y Disponibilidad</h2>
             <p>
-                Nos esforzamos por mostrar con la mayor precisión posible los colores, características y detalles de nuestros productos. Sin embargo, no podemos garantizar que la pantalla de tu dispositivo muestre los colores de manera exacta. Todos los pedidos están sujetos a disponibilidad de inventario.
+                Las fotografías mostradas en nuestro menú son de carácter ilustrativo para presentar nuestros platillos y bebidas. Todos los alimentos se preparan con ingredientes frescos del día, por lo que están sujetos a disponibilidad diaria en cocina hasta agotar existencias.
             </p>
-            <h2>3. Precios y Pagos</h2>
+            <h2>3. Precios, Promociones y Pagos</h2>
             <ul>
-                <li>Todos los precios mostrados incluyen el impuesto correspondiente (IVA), salvo indicación contraria.</li>
-                <li>Los gastos de envío se calcularán y mostrarán al momento de finalizar la compra.</li>
-                <li>Nos reservamos el derecho de modificar los precios en cualquier momento sin previo aviso.</li>
+                <li>Todos los precios mostrados están expresados en moneda local e incluyen impuestos aplicables.</li>
+                <li>Las promociones especiales (como descuentos porcentuales, <strong>2x1</strong> o <strong>3x2</strong>) aplican únicamente sobre los platillos o bebidas señalados y durante la vigencia publicada.</li>
+                <li>El costo de envío a domicilio (cuando aplique) se confirmará al momento de recibir tu pedido según la zona de entrega.</li>
+                <li>Nos reservamos el derecho de actualizar precios o promociones del menú sin previo aviso.</li>
             </ul>
-            <h2>4. Políticas de Envío</h2>
+            <h2>4. Pedidos, Tiempos de Preparación y Entrega</h2>
             <p>
-                Los pedidos son procesados en un plazo de <strong>[1 a 3 días hábiles]</strong>. Los tiempos de tránsito dependen de la paquetería seleccionada y la zona de entrega. No nos hacemos responsables por demoras causadas por terceros o situaciones de fuerza mayor.
+                Los pedidos enviados por WhatsApp quedan confirmados una vez que nuestro equipo responda verificando la orden y el tiempo estimado de preparación (habitualmente entre <strong>[25 y 45 minutos]</strong>, dependiendo de la demanda y distancia). Puedes elegir entre entrega a domicilio dentro de nuestra zona de cobertura o recolección en sucursal.
             </p>
-            <h2>5. Cambios y Devoluciones</h2>
+            <h2>5. Cancelaciones, Cambios y Garantía de Sabor</h2>
             <p>
-                Aceptamos devoluciones dentro de los <strong>[15 días naturales]</strong> posteriores a la recepción del pedido, siempre y cuando el producto se encuentre en sus condiciones originales, sin uso y con sus etiquetas y empaques originales. Los gastos de envío por devolución corren a cargo del comprador.
+                Tratándose de alimentos y bebidas de preparación inmediata, solo se aceptan modificaciones o cancelaciones dentro de los primeros <strong>[5 minutos]</strong> posteriores a la confirmación del pedido. Si algún platillo llega incompleto o en mal estado, repórtalo de inmediato al recibirlo para reponerlo o brindarte una solución.
             </p>
-            <h2>6. Propiedad Intelectual</h2>
+            <h2>6. Alérgenos y Restricciones Alimentarias</h2>
             <p>
-                Todo el contenido incluido en este sitio, como textos, gráficos, logotipos e imágenes, es propiedad de <strong>{SITE_TITLE}</strong> o de sus proveedores de contenido, y está protegido por las leyes de propiedad intelectual internacionales.
+                Si tienes alguna alergia o restricción alimentaria, te pedimos indicarlo claramente en la sección de <strong>Notas adicionales</strong> al armar tu pedido o mencionarlo directamente al confirmar tu orden por mensaje.
+            </p>
+            <h2>7. Propiedad Intelectual</h2>
+            <p>
+                Todo el contenido incluido en este sitio, como textos, fotografías de platillos, logotipos y diseño del menú, es propiedad de <strong>{SITE_PROPIETARIO}</strong> o de sus respectivos titulares.
             </p>
             <div class="divider mt-12"></div>
             <p class="text-sm opacity-70 text-center italic">
-                *Nota para la plantilla: Este es un texto de ejemplo. El propietario de la tienda debe sustituir esta información con las políticas legales correspondientes a su país y modelo de negocio.
+                *Nota para la plantilla: Este es un texto base para restaurantes y negocios de comida. El propietario debe ajustar los tiempos, zonas de reparto y políticas según su operación.
             </p>
         </article>
     </main>

@@ -1,6 +1,7 @@
 ---
-import { SITE_TITLE } from '../consts';
+import { SITE_TITLE, Menu } from '../consts';
 import HeaderLink from './HeaderLink.astro';
+import CarritoModal from './CarritoModal.astro';
 import { Icon } from 'astro-icon/components';
 ---
 
@@ -38,7 +39,6 @@ import { Icon } from 'astro-icon/components';
         </div>
 <!--Barra de busqueda -->
         <div class="navbar-center flex-1 px-4">
-            <!-- Quitamos max-w-md, dejamos w-full -->
             <form action="/productos" method="GET" class="w-full">
                 <label class="input w-full rounded-full flex items-center gap-2 bg-base-200">
                     <input type="text" name="q" placeholder="Busca tu producto..." class="grow" />
@@ -46,13 +46,14 @@ import { Icon } from 'astro-icon/components';
                 </label>
             </form>
         </div>
-        <div class="navbar-end w-auto px-4">
+        <div class="navbar-end w-auto px-4 flex items-center gap-1">
 <!--Botón para cambiar de temas -->
             <label class="swap swap-rotate btn btn-ghost btn-circle">
                 <input type="checkbox" id="theme-toggle" />
                 <Icon name="tabler:sun-filled" class="w-6 h-6 stroke-2 text-yellow-500 swap-off" />
                 <Icon name="tabler:moon-filled" class="w-6 h-6 stroke-2 text-blue-300 swap-on" />
             </label>
+            {!Menu && <CarritoModal />}
         </div>
     </div>
 </header>

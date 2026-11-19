@@ -1,5 +1,5 @@
 import { config, fields, collection } from '@keystatic/core';
-import { GITHUB_REPO } from './src/consts';
+import { GITHUB_REPO, SITE_PROPIETARIO } from './src/consts';
 const isProd = import.meta.env.PROD;
 
 export default config({
@@ -24,6 +24,16 @@ export default config({
                 descripcion: fields.text({ label: 'Descripción corta', multiline: true }),
                 precio: fields.number({ label: 'Precio original ($)' }),
                 precioDescuento: fields.number({ label: 'Precio de oferta (Dejar vacío si no aplica)' }),
+                promocion: fields.select({
+                    label: 'Promoción especial (2x1, 3x2)',
+                    description: 'Selecciona si el producto tiene una promoción por cantidad',
+                    options: [
+                        { label: 'Ninguna', value: 'ninguna' },
+                        { label: '2x1 (Lleva 2, paga 1)', value: '2x1' },
+                        { label: '3x2 (Lleva 3, paga 2)', value: '3x2' },
+                    ],
+                    defaultValue: 'ninguna',
+                }),
                 categorias: fields.array(
                     fields.text({ label: 'Categoría' }),
                     { label: 'Categorías', itemLabel: props => props.value }
@@ -62,9 +72,9 @@ export default config({
         }),
 // --- COLECCIÓN DEL BLOG ---
         blog: collection({
-            label: 'Blog',
+            label: 'Avisos y Blog',
             slugField: 'title',
-            path: 'src/content/blog/*',
+            path: 'src/content/avisos/*',
             format: { contentField: 'content' },
             schema: {
                 title: fields.slug({ name: { label: 'Título del artículo' } }),
@@ -79,7 +89,7 @@ export default config({
                     publicPath: '../../assets/blog/'
                 }),
             
-                author: fields.text({ label: 'Autor', defaultValue: 'Equipo Axioma' }),
+                author: fields.text({ label: 'Autor', defaultValue: SITE_PROPIETARIO }),
                 categoria: fields.text({ label: 'Categoría' }),
             
                 tags: fields.array(

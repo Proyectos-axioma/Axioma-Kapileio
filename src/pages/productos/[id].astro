@@ -5,8 +5,7 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import type { CollectionEntry } from 'astro:content';
-import { SITE_TITLE } from '../../consts';
-import { SITE_CONTACTO } from '../../consts';
+import { SITE_TITLE, SITE_CONTACTO, Menu } from '../../consts';
 import ProductosRelacionados from '../../components/ProductosRelacionados.astro';
 export async function getStaticPaths() {
     const productos = await getCollection('productos');
@@ -17,9 +16,11 @@ export async function getStaticPaths() {
 }
 const { producto } = Astro.props;
 const { Content } = await render(producto); 
-// LÓGICA DE WHATSAPP
+// LÓGICA DE WHATSAPP Y PROMOCIÓN
+const tienePromo = Boolean(producto.data.promocion && producto.data.promocion !== 'ninguna');
 const precioFinal = producto.data.precioDescuento && producto.data.precioDescuento < producto.data.precio ? producto.data.precioDescuento : producto.data.precio;
-const mensaje = `Hola, me interesa el producto "${producto.data.nombre}" que cuesta $${precioFinal}. ¿Aún está disponible?`;
+const textoPromoWhatsApp = tienePromo ? ` (Promoción ${producto.data.promocion})` : '';
+const mensaje = `Hola, me interesa el producto "${producto.data.nombre}"${textoPromoWhatsApp} que cuesta $${precioFinal}. ¿Aún está disponible?`;
 const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(mensaje)}`;
 ---
 <Layout title={`${producto.data.nombre} | ${SITE_TITLE}`} description={producto.data.descripcion} image={producto.data.imagenPrincipal}>
@@ -35,12 +36,19 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
 <!-- Columna Izquierda: Galería Interactiva -->
         <div class="flex flex-col gap-4">
 <!-- Agregamos id="imagen-principal" -->
-            <Image 
-            id="imagen-principal"
-            src={producto.data.imagenPrincipal} 
-            alt={producto.data.nombre} 
-            class="rounded-2xl shadow-xl w-full object-cover aspect-square transition-opacity duration-300"
-            />
+            <div class="relative">
+                <Image 
+                id="imagen-principal"
+                src={producto.data.imagenPrincipal} 
+                alt={producto.data.nombre} 
+                class="rounded-2xl shadow-xl w-full object-cover aspect-square transition-opacity duration-300"
+                />
+                {tienePromo && (
+                    <span class="badge badge-warning badge-lg font-extrabold absolute top-4 right-4 shadow-md">
+                        ¡Promo {producto.data.promocion}!
+                    </span>
+                )}
+            </div>
 <!-- Galería de miniaturas -->
             {producto.data.imagenesSecundarias && (
                 <div class="flex gap-2 overflow-x-auto pb-2" id="galeria-miniaturas">
@@ -71,6 +79,9 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
                 {producto.data.destacado && (
                     <span class="badge badge-accent badge-lg">¡Destacado!</span>
                 )}
+                {tienePromo && (
+                    <span class="badge badge-warning badge-lg font-bold">¡{producto.data.promocion}!</span>
+                )}
                 {producto.data.categorias.map((cat: string) => (
                     <a href={`/productos?categoria=${encodeURIComponent(cat)}`} class="badge badge-lg badge-primary">{cat}</a>
                 ))}
@@ -83,7 +94,7 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
                 )}
             </div>
             <h1 class="text-4xl md:text-5xl font-bold mb-4">{producto.data.nombre}</h1>
-            <div class="flex items-end gap-3 mb-6">
+            <div class="flex items-end flex-wrap gap-3 mb-6">
                 {producto.data.precioDescuento && producto.data.precioDescuento < producto.data.precio ? (
                     <>
                         <p class="text-4xl font-bold text-error">${producto.data.precioDescuento}</p>
@@ -95,24 +106,45 @@ const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(me
                 ) : (
                     <p class="text-4xl font-bold text-primary">${producto.data.precio}</p>
                 )}
+                {tienePromo && (
+                    <div class="badge badge-warning badge-lg font-extrabold mb-1.5">
+                        Promoción {producto.data.promocion}
+                    </div>
+                )}
             </div>
             <p class="text-lg text-base-content/80 mb-8 leading-relaxed">
                 {producto.data.descripcion}
             </p>
-<!-- Botón de Compra con validación de Stock -->
-            <div class="flex flex-col sm:flex-row gap-4 mb-10">
-                {producto.data.disponibilidad ? (
-                    <a href={urlWhatsApp} target="_blank" rel="noopener noreferrer" class="btn btn-success btn-lg flex-1 shadow-lg hover:shadow-primary/50 transition-shadow">
-                        <Icon name="tabler:brand-whatsapp" class="w-6 h-6" />
-                        Comprar ahora
-                    </a>
-                ) : (
-                    <button class="btn btn-disabled btn-lg flex-1" disabled>
-                        <Icon name="tabler:shopping-cart-off" class="w-6 h-6" />
-                        Producto sin stock
-                    </button>
-                )}
-            </div>
+<!-- Botón de Compra con validación de Stock y modo Menú -->
+            {!Menu && (
+                <div class="flex flex-col sm:flex-row gap-4 mb-10">
+                    {producto.data.disponibilidad ? (
+                        <>
+                            <button 
+                                type="button"
+                                class="btn btn-primary btn-lg flex-1 shadow-lg btn-agregar-carrito"
+                                data-id={producto.id}
+                                data-nombre={producto.data.nombre}
+                                data-precio={precioFinal}
+                                data-promocion={producto.data.promocion || 'ninguna'}
+                                data-imagen={producto.data.imagenPrincipal?.src || ''}
+                            >
+                                <Icon name="tabler:shopping-cart-plus" class="w-6 h-6" />
+                                Agregar al carrito
+                            </button>
+                            <a href={urlWhatsApp} target="_blank" rel="noopener noreferrer" class="btn btn-success btn-lg flex-1 shadow-lg hover:shadow-primary/50 transition-shadow">
+                                <Icon name="tabler:brand-whatsapp" class="w-6 h-6" />
+                                Pedir directo
+                            </a>
+                        </>
+                    ) : (
+                        <button class="btn btn-disabled btn-lg flex-1" disabled>
+                            <Icon name="tabler:shopping-cart-off" class="w-6 h-6" />
+                            Producto sin stock
+                        </button>
+                    )}
+                </div>
+            )}
             <div class="divider">Más detalles</div>
             <article class="prose prose-base sm:prose-lg text-base-content max-w-none">
                 <Content />

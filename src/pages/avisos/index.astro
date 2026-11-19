@@ -30,7 +30,7 @@ const posts = (await getCollection('blog'))
 					{posts.map((post: any, index: number) => (
 						<div class={`card bg-base-100 shadow-xl transition-transform hover:-translate-y-2 border border-base-200 ${index === 0 ? 'md:col-span-2 lg:col-span-3 md:flex-row' : ''}`}>
 							<figure class={index === 0 ? 'md:w-1/2' : ''}>
-  								<a href={`/blog/${post.id}/`} class="w-full h-full block bg-base-200 rounded-xl overflow-hidden">
+  								<a href={`/avisos/${post.id}/`} class="w-full h-full block bg-base-200 rounded-xl overflow-hidden">
     								{post.data.heroImage && (
       									<Image 
         								width={720} height={360} 
@@ -51,7 +51,7 @@ const posts = (await getCollection('blog'))
 									)}
 								</div>
 								<h2 class={`card-title font-bold ${index === 0 ? 'text-3xl md:text-4xl' : 'text-xl md:text-2xl'}`}>
-									<a href={`/blog/${post.id}/`} class="hover:text-primary transition-colors">
+									<a href={`/avisos/${post.id}/`} class="hover:text-primary transition-colors">
 										{post.data.title}
 									</a>
 								</h2>
@@ -64,7 +64,7 @@ const posts = (await getCollection('blog'))
 									{post.data.description}
 								</p>
 								<div class="card-actions justify-end mt-6">
-									<a href={`/blog/${post.id}/`} class="btn btn-neutral btn-sm">Leer artículo</a>
+									<a href={`/avisos/${post.id}/`} class="btn btn-neutral btn-sm">Leer artículo</a>
 								</div>
 							</div>
 						</div>

@@ -4,10 +4,15 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import { Menu } from '../consts';
 import VistaProducto from './VistaProducto.astro';
-const esmenu= Menu;
+const esmenu = Menu;
 const productos = await getCollection('productos');
-// Filtramos solo los productos con descuento válido Y que tengan stock
-const ofertas = productos.filter(p => p.data.disponibilidad && p.data.precioDescuento != null && p.data.precioDescuento < p.data.precio);
+// Filtramos solo los productos con descuento válido O promoción por cantidad (2x1, 3x2) Y que tengan stock
+const ofertas = productos.filter(p => {
+    if (!p.data.disponibilidad) return false;
+    const tieneDescuento = p.data.precioDescuento != null && p.data.precioDescuento < p.data.precio;
+    const tienePromo = p.data.promocion && p.data.promocion !== 'ninguna';
+    return tieneDescuento || tienePromo;
+});
 // Si no hay ninguna oferta activa, el componente se autodestruye y no renderiza nada
 if (ofertas.length === 0) {
     return;
@@ -15,11 +20,14 @@ if (ofertas.length === 0) {
 // Seleccionamos una oferta al azar
 const indiceAzar = Math.floor(Math.random() * ofertas.length);
 const productoOferta = ofertas[indiceAzar];
-// Calculamos el porcentaje de descuento automáticamente
+
+const tienePromoCantidad = Boolean(productoOferta.data.promocion && productoOferta.data.promocion !== 'ninguna');
+const tieneDescuentoPrecio = Boolean(productoOferta.data.precioDescuento != null && productoOferta.data.precioDescuento < productoOferta.data.precio);
+
+// Calculamos el porcentaje de descuento automáticamente si aplica
 const precioNormal = productoOferta.data.precio;
-// TypeScript a veces requiere el "as number" aquí aunque ya validamos que existe
-const precioRebajado = productoOferta.data.precioDescuento as number; 
-const porcentajeDescuento = Math.round(((precioNormal - precioRebajado) / precioNormal) * 100);
+const precioRebajado = tieneDescuentoPrecio ? (productoOferta.data.precioDescuento as number) : precioNormal;
+const porcentajeDescuento = tieneDescuentoPrecio ? Math.round(((precioNormal - precioRebajado) / precioNormal) * 100) : 0;
 ---
 <section class="py-8 my-12 px-4 max-w-7xl mx-auto">
 <!-- Contenedor principal con fondo gris claro y bordes muy redondeados -->
@@ -27,12 +35,20 @@ const porcentajeDescuento = Math.round(((precioNormal - precioRebajado) / precio
     
 <!-- Columna Izquierda: Textos y Botón -->
         <div class="flex-1 text-center md:text-left flex flex-col items-center md:items-start max-w-xl">
-            <span class="text-sm md:text-base font-bold uppercase tracking-wide mb-4">
+            <span class="text-sm md:text-base font-bold uppercase tracking-wide mb-4 flex items-center gap-2">
                 Oferta especial
+                {tienePromoCantidad && (
+                    <span class="badge badge-warning font-bold">¡{productoOferta.data.promocion}!</span>
+                )}
             </span>
-<!-- Título principal inyectando el porcentaje calculado -->
+<!-- Título principal inyectando la promoción o porcentaje calculado -->
             <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                {productoOferta.data.nombre} <br/> ¡Obtén un {porcentajeDescuento}% de descuento!
+                {productoOferta.data.nombre} <br/>
+                {tienePromoCantidad ? (
+                    <>¡Llévatelo al {productoOferta.data.promocion}!</>
+                ) : (
+                    <>¡Obtén un {porcentajeDescuento}% de descuento!</>
+                )}
             </h2>
             <p class="text-base md:text-lg opacity-70 mb-8">
                 ¡No te lo pierdas!

@@ -33,6 +33,7 @@ const relacionadosAleatorios = relacionados.sort(() => 0.5 - Math.random()).slic
                     titulo={producto.data.nombre}
                     precio={producto.data.precio}
                     precioDescuento={producto.data.precioDescuento}
+                    promocion={producto.data.promocion}
                     imagen={producto.data.imagenPrincipal}
                     disponible={producto.data.disponibilidad}
                     url={`/productos/${producto.id}`}

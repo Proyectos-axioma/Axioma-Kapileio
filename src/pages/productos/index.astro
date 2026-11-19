@@ -6,9 +6,13 @@ import { getCollection } from 'astro:content';
 import { SITE_TITLE } from '../../consts';
 import { Icon } from 'astro-icon/components';
 const productos = await getCollection('productos');
-// Extraemos Categorías y Subcategorías
+// Extraemos Categorías, Subcategorías y Promociones
 const categoriasMap = new Map();
 const subcategoriasMap = new Map();
+const promosMap = new Map<string, number>();
+let totalOfertasYPromos = 0;
+let totalConDescuento = 0;
+
 productos.forEach((p) => {
     p.data.categorias.forEach((cat: string) => {
         categoriasMap.set(cat, (categoriasMap.get(cat) || 0) + 1);
@@ -19,9 +23,21 @@ productos.forEach((p) => {
             subcategoriasMap.set(sub, (subcategoriasMap.get(sub) || 0) + 1);
         });
     }
+    const tieneDescuento = Boolean(p.data.precioDescuento && p.data.precioDescuento < p.data.precio);
+    const tienePromo = Boolean(p.data.promocion && p.data.promocion !== 'ninguna');
+    if (tieneDescuento || tienePromo) {
+        totalOfertasYPromos++;
+    }
+    if (tieneDescuento) {
+        totalConDescuento++;
+    }
+    if (tienePromo && p.data.promocion) {
+        promosMap.set(p.data.promocion, (promosMap.get(p.data.promocion) || 0) + 1);
+    }
 });
 const categoriasUnicas = Array.from(categoriasMap.entries()).sort();
 const subcategoriasUnicas = Array.from(subcategoriasMap.entries()).sort();
+const promosUnicas = Array.from(promosMap.entries()).sort();
 ---
 <Layout title={`Catálogo de Productos - ${SITE_TITLE}`}>
     <main class="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
@@ -37,6 +53,35 @@ const subcategoriasUnicas = Array.from(subcategoriasMap.entries()).sort();
             </button>
 <!-- Contenedor que se oculta en móvil (hidden) y siempre se ve en PC (md:block) -->
             <div id="menu-filtros" class="hidden md:block">
+                {totalOfertasYPromos > 0 && (
+                    <>
+                        <h2 class="text-xl font-bold mb-4 border-b border-base-300 pb-2 hidden md:block">Promociones</h2>
+                        <ul class="menu bg-base-200 w-full rounded-box mb-6">
+                            <li>
+                                <a href="/productos?promo=todas" class="flex justify-between hover:text-warning font-semibold">
+                                    <span>Todas las ofertas</span>
+                                    <span class="badge badge-sm badge-warning font-bold">{totalOfertasYPromos}</span>
+                                </a>
+                            </li>
+                            {totalConDescuento > 0 && (
+                                <li>
+                                    <a href="/productos?promo=descuento" class="flex justify-between hover:text-warning">
+                                        <span>Con % de descuento</span>
+                                        <span class="badge badge-sm badge-ghost">{totalConDescuento}</span>
+                                    </a>
+                                </li>
+                            )}
+                            {promosUnicas.map(([promo, count]) => (
+                                <li>
+                                    <a href={`/productos?promo=${encodeURIComponent(promo)}`} class="flex justify-between hover:text-warning">
+                                        <span>Promo {promo}</span>
+                                        <span class="badge badge-sm badge-ghost">{count}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                )}
                 <h2 class="text-xl font-bold mb-4 border-b border-base-300 pb-2 hidden md:block">Categorías</h2>
                 <ul class="menu bg-base-200 w-full rounded-box mb-6">
                     <li>
@@ -78,24 +123,31 @@ const subcategoriasUnicas = Array.from(subcategoriasMap.entries()).sort();
                 Mostrando resultados para: <span id="termino-busqueda" class="font-bold text-primary"></span>
             </div>
             <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {productos.map((producto: any) => (
-                    <div 
-                    class="producto-item transition-all duration-300"
-                    data-nombre={producto.data.nombre}
-                    data-categorias={JSON.stringify(producto.data.categorias)}
-                    data-subcategorias={JSON.stringify(producto.data.subcategorias || [])}
-                    >
-                        <ProductoCard 
-                        titulo={producto.data.nombre}
-                        precio={producto.data.precio}
-                        precioDescuento={producto.data.precioDescuento}
-                        imagen={producto.data.imagenPrincipal}
-                        disponible={producto.data.disponibilidad}
-                        url={`/productos/${producto.id}`}
-                        producto={producto}
-                        />
-                    </div>
-                ))}
+                {productos.map((producto: any) => {
+                    const tieneDescuento = Boolean(producto.data.precioDescuento && producto.data.precioDescuento < producto.data.precio);
+                    const promoActual = producto.data.promocion || 'ninguna';
+                    return (
+                        <div 
+                        class="producto-item transition-all duration-300"
+                        data-nombre={producto.data.nombre}
+                        data-categorias={JSON.stringify(producto.data.categorias)}
+                        data-subcategorias={JSON.stringify(producto.data.subcategorias || [])}
+                        data-promocion={promoActual}
+                        data-descuento={tieneDescuento ? 'true' : 'false'}
+                        >
+                            <ProductoCard 
+                            titulo={producto.data.nombre}
+                            precio={producto.data.precio}
+                            precioDescuento={producto.data.precioDescuento}
+                            promocion={producto.data.promocion}
+                            imagen={producto.data.imagenPrincipal}
+                            disponible={producto.data.disponibilidad}
+                            url={`/productos/${producto.id}`}
+                            producto={producto}
+                            />
+                        </div>
+                    );
+                })}
             </div>
             <div id="sin-resultados" class="hidden text-center py-20">
                 <h3 class="text-2xl font-bold opacity-50">No se encontraron productos.</h3>
@@ -114,8 +166,9 @@ const subcategoriasUnicas = Array.from(subcategoriasMap.entries()).sort();
         const busquedaOriginal = params.get('q');
         const busquedaNormalizada = normalizar(busquedaOriginal);
         const categoriaFiltro = params.get('categoria');
-// Capturamos la subcategoría de la URL
+// Capturamos la subcategoría y promoción de la URL
         const subcategoriaFiltro = params.get('subcategoria');
+        const promoFiltro = params.get('promo');
         const productos = document.querySelectorAll('.producto-item');
         const infoBusqueda = document.getElementById('info-busqueda');
         const terminoBusqueda = document.getElementById('termino-busqueda');
@@ -132,19 +185,30 @@ const subcategoriasUnicas = Array.from(subcategoriasMap.entries()).sort();
                 if (iconoFiltros) iconoFiltros.classList.toggle('rotate-180'); 
             });
         }
-        if (busquedaOriginal || categoriaFiltro || subcategoriaFiltro) {
+        if (busquedaOriginal || categoriaFiltro || subcategoriaFiltro || promoFiltro) {
             infoBusqueda.classList.remove('hidden');
 // Muestra el nombre de lo que estés filtrando
-            terminoBusqueda.textContent = busquedaOriginal ? `"${busquedaOriginal}"` : (categoriaFiltro || subcategoriaFiltro);
+            let etiquetaPromo = '';
+            if (promoFiltro === 'todas') {
+                etiquetaPromo = 'Todas las ofertas y promociones';
+            } else if (promoFiltro === 'descuento') {
+                etiquetaPromo = 'Productos con % de descuento';
+            } else if (promoFiltro) {
+                etiquetaPromo = `Promoción ${promoFiltro}`;
+            }
+            terminoBusqueda.textContent = busquedaOriginal ? `"${busquedaOriginal}"` : (categoriaFiltro || subcategoriaFiltro || etiquetaPromo);
         }
         productos.forEach(producto => {
             const nombreProducto = normalizar(producto.getAttribute('data-nombre'));
             const categorias = JSON.parse(producto.getAttribute('data-categorias') || '[]');
-// Extraemos el array de subcategorías de la tarjeta
+// Extraemos el array de subcategorías y datos de promoción de la tarjeta
             const subcategorias = JSON.parse(producto.getAttribute('data-subcategorias') || '[]');
+            const promocion = producto.getAttribute('data-promocion') || 'ninguna';
+            const tieneDescuento = producto.getAttribute('data-descuento') === 'true';
             let coincideBusqueda = true;
             let coincideCategoria = true;
             let coincideSubcategoria = true;
+            let coincidePromo = true;
             if (busquedaNormalizada) {
                 coincideBusqueda = nombreProducto.includes(busquedaNormalizada);
             }
@@ -155,8 +219,17 @@ const subcategoriasUnicas = Array.from(subcategoriasMap.entries()).sort();
             if (subcategoriaFiltro) {
                 coincideSubcategoria = subcategorias.includes(subcategoriaFiltro);
             }
+            if (promoFiltro) {
+                if (promoFiltro === 'todas') {
+                    coincidePromo = tieneDescuento || (promocion !== 'ninguna');
+                } else if (promoFiltro === 'descuento') {
+                    coincidePromo = tieneDescuento;
+                } else {
+                    coincidePromo = promocion === promoFiltro;
+                }
+            }
 // Si cumple con todas las condiciones activas, se muestra
-            if (coincideBusqueda && coincideCategoria && coincideSubcategoria) {
+            if (coincideBusqueda && coincideCategoria && coincideSubcategoria && coincidePromo) {
                 producto.style.display = 'block';
                 visibles++;
             }

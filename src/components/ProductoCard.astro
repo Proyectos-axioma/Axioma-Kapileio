@@ -8,16 +8,22 @@ interface Props {
     titulo: string;
     precio: number;
     precioDescuento?: number | null; // Opcional
+    promocion?: string | null; // Opcional ('ninguna' | '2x1' | '3x2')
     imagen: any;
     disponible: boolean;
     url: string;
     producto?: CollectionEntry<'productos'>;
 }
-const { titulo, precio, precioDescuento, imagen, disponible, url, producto } = Astro.props;
+const { titulo, precio, precioDescuento, promocion, imagen, disponible, url, producto } = Astro.props;
 const esmenu = Menu;
+const promoFinal = promocion ?? producto?.data.promocion;
+const tienePromo = Boolean(promoFinal && promoFinal !== 'ninguna');
+const precioEfectivo = (precioDescuento && precioDescuento < precio) ? precioDescuento : precio;
+const idProducto = producto?.id || url.split('/').filter(Boolean).pop() || titulo;
+const srcImagen = typeof imagen === 'string' ? imagen : (imagen?.src || '');
 ---
 <div class="card bg-base-100 w-full shadow-xl transition-transform hover:-translate-y-1">
-    <figure>
+    <figure class="relative">
         {esmenu ? (
             <Image src={imagen} alt={titulo} width={400} height={300} class="h-48 w-full object-cover" />
         ) : (
@@ -25,9 +31,14 @@ const esmenu = Menu;
                 <Image src={imagen} alt={titulo} width={400} height={300} class="h-48 w-full object-cover" />
             </a>
         )}
+        {tienePromo && (
+            <span class="badge badge-warning badge-lg font-extrabold absolute top-3 right-3 shadow-md">
+                ¡{promoFinal}!
+            </span>
+        )}
     </figure>
     <div class="card-body">
-        <h2 class="card-title text-base sm:text-lg">
+        <h2 class="card-title text-base sm:text-lg flex-wrap">
             {esmenu ? (
                 <span>{titulo}</span>
             ) : (
@@ -39,8 +50,8 @@ const esmenu = Menu;
                 <div class="badge badge-error badge-sm">Agotado</div>
             )}
         </h2>
-<!-- Lógica de precios -->
-        <div class="flex items-center gap-2 mt-1">
+<!-- Lógica de precios y promociones -->
+        <div class="flex items-center flex-wrap gap-2 mt-1">
             {precioDescuento && precioDescuento < precio ? (
                 <>
                     <p class="text-xl font-bold text-error">${precioDescuento}</p>
@@ -48,6 +59,11 @@ const esmenu = Menu;
                 </>
             ) : (
                 <p class="text-xl font-bold">${precio}</p>
+            )}
+            {tienePromo && (
+                <span class="badge badge-warning badge-outline font-bold text-xs">
+                    Promo {promoFinal}
+                </span>
             )}
         </div>
         <div class="card-actions justify-end mt-4">
@@ -62,9 +78,17 @@ const esmenu = Menu;
                     <a href={url} class="btn btn-outline btn-sm">Ver detalles</a>
 <!-- Condicional para el botón de pedir -->
                     {disponible ? (
-                        <a href={url} class="btn btn-primary btn-sm sm:w-auto">
-                            Pedir
-                        </a>
+                        <button 
+                            type="button"
+                            class="btn btn-primary btn-sm sm:w-auto btn-agregar-carrito"
+                            data-id={idProducto}
+                            data-nombre={titulo}
+                            data-precio={precioEfectivo}
+                            data-promocion={promoFinal || 'ninguna'}
+                            data-imagen={srcImagen}
+                        >
+                            Agregar
+                        </button>
                     ) : (
                         <button class="btn btn-disabled btn-sm sm:w-auto" disabled>
                             Agotado

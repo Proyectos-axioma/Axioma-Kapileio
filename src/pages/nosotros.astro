@@ -2,45 +2,45 @@
 import Layout from '../layouts/Layout.astro';
 import { SITE_TITLE } from '../consts';
 ---
-<Layout title={`Sobre Nosotros | ${SITE_TITLE}`} description="Conoce más sobre nuestra historia, misión y valores.">
+<Layout title={`Sobre Nosotros | ${SITE_TITLE}`} description="Conoce más sobre nuestra cocina, tradición y pasión por el buen sabor.">
 	<main class="container mx-auto px-4 py-12 max-w-6xl">
 		<div class="text-center mb-16">
 			<h1 class="text-4xl md:text-6xl font-extrabold mb-4">Nuestra Historia</h1>
 			<p class="text-lg opacity-70 max-w-2xl mx-auto">
-				{SITE_TITLE} nació de una idea simple: ofrecer productos de alta calidad con un diseño excepcional, acercándolos a personas que valoran los detalles.
+				{SITE_TITLE} nació de una pasión simple: compartir el auténtico sabor de nuestra cocina tradicional, preparando cada platillo al momento con ingredientes frescos del día.
 			</p>
 		</div>
 <!-- Sección Imagen + Texto -->
 	    <div class="flex flex-col md:flex-row items-center gap-12 mb-20">
 			<div class="w-full md:w-1/2">
-<!-- Reemplaza el src con una imagen genérica o usa un div con bg-base-200 -->
+<!-- Reemplaza el src con una imagen del restaurante/cocina o usa un div con bg-base-200 -->
 		        <div class="w-full aspect-[4/3] bg-base-200 rounded-3xl overflow-hidden shadow-xl flex items-center justify-center">
-        		    <span class="opacity-50">[Imagen del equipo o tienda física]</span>
+        		    <span class="opacity-50">[Imagen de nuestra cocina o sucursal]</span>
         		</div>
       		</div>
       		<div class="w-full md:w-1/2 prose prose-lg text-base-content">
         		<h2>¿Quiénes somos?</h2>
 		        <p>
-					Somos un equipo apasionado por [Industria del cliente, ej: la tecnología / el diseño interior]. Nuestro objetivo es redefinir la forma en que interactúas con los productos del día a día.
+					Somos un equipo apasionado por la gastronomía y el servicio cálido. Nuestro objetivo es que cada comida, ya sea en nuestra mesa o en la comodidad de tu hogar, se sienta como recién salida del comal.
         		</p>
 		        <p>
-					Trabajamos directamente con proveedores seleccionados para garantizar que cada artículo que llega a tus manos cumpla con los más altos estándares de calidad.
+					Seleccionamos cuidadosamente cada ingrediente con productores locales para garantizar que cada platillo, bebida y postre mantenga el sazón casero y la frescura que nos distingue.
         		</p>
       		</div>
     	</div>
 <!-- Valores -->
 	    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
 			<div class="bg-base-200 p-8 rounded-2xl">
-        		<h3 class="text-2xl font-bold mb-3">Calidad</h3>
-        		<p class="opacity-70">Materiales de primera y procesos rigurosos en cada artículo de nuestro catálogo.</p>
+        		<h3 class="text-2xl font-bold mb-3">Frescura</h3>
+        		<p class="opacity-70">Ingredientes seleccionados cada mañana y platillos preparados al momento de tu orden.</p>
 			</div>
 			<div class="bg-base-200 p-8 rounded-2xl">
-        		<h3 class="text-2xl font-bold mb-3">Compromiso</h3>
-        		<p class="opacity-70">Atención al cliente excepcional y tiempos de envío optimizados para tu comodidad.</p>
+        		<h3 class="text-2xl font-bold mb-3">Sazón Tradicional</h3>
+        		<p class="opacity-70">Recetas auténticas cuidadas al detalle para conservar el verdadero sabor de casa.</p>
 			</div>
 			<div class="bg-base-200 p-8 rounded-2xl">
-        		<h3 class="text-2xl font-bold mb-3">Innovación</h3>
-        		<p class="opacity-70">Buscamos constantemente las últimas tendencias para mantener nuestro catálogo actualizado.</p>
+        		<h3 class="text-2xl font-bold mb-3">Servicio Rápido</h3>
+        		<p class="opacity-70">Atención cálida en sucursal y pedidos ágiles para llevar o recibir en tu domicilio.</p>
       		</div>
     	</div>
 	</main>
