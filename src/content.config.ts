@@ -4,7 +4,7 @@ import { z } from 'astro/zod';
 import { SITE_PROPIETARIO } from './consts';
 
 const blog = defineCollection({
-	loader: glob({ base: './src/content/blog', pattern: '**/*.{md,mdx}' }),
+	loader: glob({ base: './src/content/avisos', pattern: '**/*.{md,mdx}' }),
 	schema: ({ image }) =>
 		z.object({
 // LO OBLIGATORIO (Lo mínimo para que no explote)

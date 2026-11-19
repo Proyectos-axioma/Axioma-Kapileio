@@ -19,12 +19,12 @@ const posts = (await getCollection('blog'))
 <!doctype html>
 <html lang="es-MX">
 	<head>
-		<BaseHead title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Avisos y promociones | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
 		<Header />
 		<main class="container mx-auto px-4 py-12 max-w-7xl">
-			<h1 class="text-4xl md:text-5xl font-bold text-center mb-12">Blog y Novedades</h1>
+			<h1 class="text-4xl md:text-5xl font-bold text-center mb-12">Avisos y promociones</h1>
 			<section>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 					{posts.map((post: any, index: number) => (

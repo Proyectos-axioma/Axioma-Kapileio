@@ -20,11 +20,11 @@ import { Icon } from 'astro-icon/components';
 <!--Opciones del drawer -->
                     <ul class="menu bg-base-200 min-h-full w-80 p-4 text-xl">
                         <div class="my-6 flex w-full font-semibold gap-2">
-                            <Icon name="tabler:building-store" class="w-6 h-6 stroke-2" />  {SITE_TITLE}
+                            <Icon name="tabler:bowl-chopsticks" class="w-6 h-6 stroke-2" />  {SITE_TITLE}
                         </div>
                         <li><HeaderLink href="/">Inicio</HeaderLink></li>
                         <li><HeaderLink href="/productos">Productos</HeaderLink></li>
-                        <li><HeaderLink href="/blog">Blog</HeaderLink></li>
+                        <li><HeaderLink href="/avisos">Avisos y promociones</HeaderLink></li>
                         <li><HeaderLink href="/nosotros">Sobre nosotros</HeaderLink></li>
                     </ul>
                 </div>
@@ -32,7 +32,7 @@ import { Icon } from 'astro-icon/components';
 <!-- Logo y nombre del sitio -->
             <div class="px-1">
                 <a href="/" class="btn btn-ghost text-2xl">
-                    <Icon name="tabler:building-store" class="w-6 h-6 stroke-2" />  {SITE_TITLE}
+                    <Icon name="tabler:bowl-chopsticks" class="w-6 h-6 stroke-2" />  {SITE_TITLE}
                 </a>
             </div>
         </div>
@@ -58,8 +58,8 @@ import { Icon } from 'astro-icon/components';
 </header>
 <script is:inline>
 //Temas
-    const TEMA_CLARO = 'corporate';
-    const TEMA_OSCURO = 'business';
+    const TEMA_CLARO = 'caramellatte';
+    const TEMA_OSCURO = 'coffee';
   
     const themeToggle = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement;

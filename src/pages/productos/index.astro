@@ -91,7 +91,8 @@ const subcategoriasUnicas = Array.from(subcategoriasMap.entries()).sort();
                         precioDescuento={producto.data.precioDescuento}
                         imagen={producto.data.imagenPrincipal}
                         disponible={producto.data.disponibilidad}
-                        url={`/productos/${producto.id}`} 
+                        url={`/productos/${producto.id}`}
+                        producto={producto}
                         />
                     </div>
                 ))}

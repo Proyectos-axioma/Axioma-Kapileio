@@ -1,4 +1,9 @@
 ---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { Menu } from '../consts';
+import VistaProducto from './VistaProducto.astro';
+
 interface Props {
     titulo: string;
     precio: number;
@@ -6,19 +11,28 @@ interface Props {
     imagen: any;
     disponible: boolean;
     url: string;
+    producto?: CollectionEntry<'productos'>;
 }
-const { titulo, precio, precioDescuento, imagen, disponible, url } = Astro.props;
-import { Image } from 'astro:assets';
+const { titulo, precio, precioDescuento, imagen, disponible, url, producto } = Astro.props;
+const esmenu = Menu;
 ---
 <div class="card bg-base-100 w-full shadow-xl transition-transform hover:-translate-y-1">
     <figure>
-        <a href={url} class="w-full">
+        {esmenu ? (
             <Image src={imagen} alt={titulo} width={400} height={300} class="h-48 w-full object-cover" />
-        </a>
+        ) : (
+            <a href={url} class="w-full">
+                <Image src={imagen} alt={titulo} width={400} height={300} class="h-48 w-full object-cover" />
+            </a>
+        )}
     </figure>
     <div class="card-body">
         <h2 class="card-title text-base sm:text-lg">
-            <a href={url} class="hover:text-primary transition-colors">{titulo}</a>
+            {esmenu ? (
+                <span>{titulo}</span>
+            ) : (
+                <a href={url} class="hover:text-primary transition-colors">{titulo}</a>
+            )}
             {disponible ? (
                 <div class="badge badge-success badge-sm">Stock</div>
             ) : (
@@ -37,16 +51,26 @@ import { Image } from 'astro:assets';
             )}
         </div>
         <div class="card-actions justify-end mt-4">
-            <a href={url} class="btn btn-outline btn-sm">Ver detalles</a>
-<!-- Condicional para el botón de pedir -->
-            {disponible ? (
-                <a href={url} class="btn btn-primary btn-sm sm:w-auto">
-                    Pedir
-                </a>
+            {esmenu && producto ? (
+                <VistaProducto 
+                    producto={producto} 
+                    textoBoton="Ver detalles" 
+                    claseBoton="btn btn-primary btn-sm sm:w-auto" 
+                />
             ) : (
-                <button class="btn btn-disabled btn-sm sm:w-auto" disabled>
-                    Agotado
-                </button>
+                <>
+                    <a href={url} class="btn btn-outline btn-sm">Ver detalles</a>
+<!-- Condicional para el botón de pedir -->
+                    {disponible ? (
+                        <a href={url} class="btn btn-primary btn-sm sm:w-auto">
+                            Pedir
+                        </a>
+                    ) : (
+                        <button class="btn btn-disabled btn-sm sm:w-auto" disabled>
+                            Agotado
+                        </button>
+                    )}
+                </>
             )}
         </div>
     </div>

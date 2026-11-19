@@ -1,0 +1,168 @@
+---
+import { Image } from 'astro:assets';
+import { render, type CollectionEntry } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import { Menu, SITE_CONTACTO } from '../consts';
+
+interface Props {
+    producto: CollectionEntry<'productos'>;
+    textoBoton?: string;
+    claseBoton?: string;
+}
+
+const { 
+    producto, 
+    textoBoton = "Ver detalles", 
+    claseBoton = "btn btn-primary btn-md lg:btn-lg rounded-none px-8 w-full sm:w-auto" 
+} = Astro.props;
+
+const { Content } = await render(producto);
+const modalId = `modal-${producto.id.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+
+const precioFinal = producto.data.precioDescuento && producto.data.precioDescuento < producto.data.precio 
+    ? producto.data.precioDescuento 
+    : producto.data.precio;
+const mensaje = `Hola, me interesa el producto "${producto.data.nombre}" que cuesta $${precioFinal}. ¿Aún está disponible?`;
+const urlWhatsApp = `https://wa.me/${SITE_CONTACTO}?text=${encodeURIComponent(mensaje)}`;
+---
+
+<button class={claseBoton} onclick={`document.getElementById('${modalId}').showModal()`}>
+    {textoBoton}
+</button>
+
+<dialog id={modalId} class="modal modal-bottom sm:modal-middle text-left whitespace-normal">
+    <div class="modal-box w-11/12 max-w-4xl p-6 relative">
+        <!-- Botón X para cerrar -->
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-10">✕</button>
+        </form>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
+            <!-- Columna Izquierda: Galería Interactiva -->
+            <div class="flex flex-col gap-3 galeria-producto">
+                <Image 
+                    src={producto.data.imagenPrincipal} 
+                    alt={producto.data.nombre} 
+                    class="img-principal rounded-2xl shadow-lg w-full object-cover aspect-square transition-opacity duration-300"
+                />
+                {producto.data.imagenesSecundarias && (
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        <button type="button" class="miniatura-btn border-2 border-primary rounded-lg overflow-hidden flex-shrink-0 opacity-100">
+                            <Image 
+                                src={producto.data.imagenPrincipal} 
+                                alt="Miniatura principal" 
+                                class="w-16 h-16 sm:w-20 sm:h-20 object-cover"
+                            />
+                        </button>
+                        {producto.data.imagenesSecundarias.map((img: any, index: number) => (
+                            <button type="button" class="miniatura-btn border-2 border-transparent rounded-lg overflow-hidden flex-shrink-0 opacity-60 hover:opacity-100 transition-all">
+                                <Image 
+                                    src={img} 
+                                    alt={`Vista ${index + 2} de ${producto.data.nombre}`} 
+                                    class="w-16 h-16 sm:w-20 sm:h-20 object-cover"
+                                />
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            <!-- Columna Derecha: Detalles del Producto -->
+            <div class="flex flex-col">
+                <div class="flex flex-wrap gap-2 mb-3">
+                    {producto.data.destacado && (
+                        <span class="badge badge-accent">¡Destacado!</span>
+                    )}
+                    {producto.data.categorias.map((cat: string) => (
+                        <a href={`/productos?categoria=${encodeURIComponent(cat)}`} class="badge badge-primary">{cat}</a>
+                    ))}
+                    {producto.data.subcategorias?.map((cat: string) => (
+                        <a href={`/productos?subcategoria=${encodeURIComponent(cat)}`} class="badge badge-secondary">{cat}</a>
+                    ))}
+                    {!producto.data.disponibilidad && (
+                        <span class="badge badge-error">Agotado</span>
+                    )}
+                </div>
+
+                <h2 class="text-2xl md:text-3xl font-bold mb-3">{producto.data.nombre}</h2>
+
+                <div class="flex items-end gap-3 mb-4">
+                    {producto.data.precioDescuento && producto.data.precioDescuento < producto.data.precio ? (
+                        <>
+                            <p class="text-3xl font-bold text-error">${producto.data.precioDescuento}</p>
+                            <p class="text-xl font-semibold line-through opacity-50 mb-0.5">${producto.data.precio}</p>
+                            <div class="badge badge-error badge-outline ml-1 mb-1">
+                                -{Math.round(((producto.data.precio - producto.data.precioDescuento) / producto.data.precio) * 100)}%
+                            </div>
+                        </>
+                    ) : (
+                        <p class="text-3xl font-bold text-primary">${producto.data.precio}</p>
+                    )}
+                </div>
+
+                <p class="text-base text-base-content/80 mb-6 leading-relaxed">
+                    {producto.data.descripcion}
+                </p>
+
+                <!-- Si NO es solo menú, mostramos el botón de ordenar por WhatsApp -->
+                {!Menu && (
+                    <div class="mb-6">
+                        {producto.data.disponibilidad ? (
+                            <a href={urlWhatsApp} target="_blank" rel="noopener noreferrer" class="btn btn-success w-full shadow-lg">
+                                <Icon name="tabler:brand-whatsapp" class="w-5 h-5" />
+                                Comprar ahora
+                            </a>
+                        ) : (
+                            <button class="btn btn-disabled w-full" disabled>
+                                <Icon name="tabler:shopping-cart-off" class="w-5 h-5" />
+                                Producto sin stock
+                            </button>
+                        )}
+                    </div>
+                )}
+
+                <div class="divider my-2">Más detalles</div>
+                <article class="prose prose-sm sm:prose-base text-base-content max-w-none overflow-y-auto max-h-48 pr-2">
+                    <Content />
+                </article>
+            </div>
+        </div>
+
+        <div class="modal-action mt-6">
+            <form method="dialog">
+                <button class="btn">Cerrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Cerrar al hacer clic fuera del modal -->
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+
+<script>
+    document.querySelectorAll('.galeria-producto').forEach(galeria => {
+        const imgPrincipal = galeria.querySelector('.img-principal') as HTMLImageElement | null;
+        const botones = galeria.querySelectorAll('.miniatura-btn');
+
+        if (imgPrincipal && botones.length > 0) {
+            botones.forEach(boton => {
+                boton.addEventListener('click', () => {
+                    const imgMiniatura = boton.querySelector('img');
+                    if (imgMiniatura) {
+                        imgPrincipal.src = imgMiniatura.src;
+                        imgPrincipal.srcset = imgMiniatura.srcset;
+
+                        botones.forEach(b => {
+                            b.classList.remove('border-primary', 'opacity-100');
+                            b.classList.add('border-transparent', 'opacity-60');
+                        });
+                        boton.classList.remove('border-transparent', 'opacity-60');
+                        boton.classList.add('border-primary', 'opacity-100');
+                    }
+                });
+            });
+        }
+    });
+</script>

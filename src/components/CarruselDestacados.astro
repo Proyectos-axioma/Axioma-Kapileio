@@ -3,11 +3,14 @@
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
+import { Menu } from '../consts';
+import VistaProducto from './VistaProducto.astro';
 
 const productos = await getCollection('productos');
 // Agregamos la validación de stock al filtro de destacados
 const destacados = productos.filter((producto: CollectionEntry<'productos'>) => producto.data.destacado === true && producto.data.disponibilidad
 );
+const esmenu= Menu;
 ---
 {destacados.length > 0 && (
     <section class="relative w-full mb-12">
@@ -35,9 +38,14 @@ const destacados = productos.filter((producto: CollectionEntry<'productos'>) => 
                                 <p class="text-base sm:text-lg opacity-80 mb-8 line-clamp-2">
                                     {producto.data.descripcion}
                                 </p>
-                                <a href={`/productos/${producto.id}`} class="btn btn-primary btn-md lg:btn-lg rounded-none px-8 w-full sm:w-auto">
-                                    Cómpralo
-                                </a>
+                                {esmenu ?
+                                    <VistaProducto producto={producto} />
+                                :
+                                    <a href={`/productos/${producto.id}`} class="btn btn-primary btn-md lg:btn-lg rounded-none px-8 w-full sm:w-auto">
+                                        Haz un pedido
+                                    </a>
+                                }
+                                
                             </div>
                         </div>
                     </div>

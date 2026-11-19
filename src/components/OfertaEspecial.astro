@@ -2,7 +2,9 @@
 // src/components/OfertaEspecial.astro
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
-
+import { Menu } from '../consts';
+import VistaProducto from './VistaProducto.astro';
+const esmenu= Menu;
 const productos = await getCollection('productos');
 // Filtramos solo los productos con descuento válido Y que tengan stock
 const ofertas = productos.filter(p => p.data.disponibilidad && p.data.precioDescuento != null && p.data.precioDescuento < p.data.precio);
@@ -35,9 +37,13 @@ const porcentajeDescuento = Math.round(((precioNormal - precioRebajado) / precio
             <p class="text-base md:text-lg opacity-70 mb-8">
                 ¡No te lo pierdas!
             </p>
-            <a href={`/productos/${productoOferta.id}`} class="btn btn-primary btn-lg rounded-none px-10">
-                Comprar ahora
-            </a>
+            {esmenu ?
+                <VistaProducto producto={productoOferta} />
+            :
+                <a href={`/productos/${productoOferta.id}`} class="btn btn-primary btn-lg rounded-none px-10">
+                    Comprar ahora
+                </a>
+            }
         </div>
 <!-- Columna Derecha: Imagen -->
         <div class="flex-1 w-full max-w-sm md:max-w-md lg:max-w-lg">
