@@ -20,10 +20,26 @@ export default config({
             path: 'src/content/productos/*',
             format: { contentField: 'content' }, // Separa el frontmatter del contenido Markdown
             schema: {
-                nombre: fields.slug({ name: { label: 'Nombre del Producto' } }),
-                descripcion: fields.text({ label: 'Descripción corta', multiline: true }),
-                precio: fields.number({ label: 'Precio original ($)' }),
-                precioDescuento: fields.number({ label: 'Precio de oferta (Dejar vacío si no aplica)' }),
+                nombre: fields.slug({
+                    name: {
+                        label: 'Nombre del Producto *',
+                        validation: { isRequired: true, length: { min: 1 } }
+                    }
+                }),
+                descripcion: fields.text({
+                    label: 'Descripción corta *',
+                    multiline: true,
+                    validation: { isRequired: true, length: { min: 1 } }
+                }),
+                precio: fields.number({
+                    label: 'Precio original ($) *',
+                    defaultValue: 0,
+                    validation: { isRequired: true, min: 0 }
+                }),
+                precioDescuento: fields.number({
+                    label: 'Precio de oferta (Dejar vacío si no aplica)',
+                    validation: { min: 0 }
+                }),
                 promocion: fields.select({
                     label: 'Promoción especial (2x1, 3x2)',
                     description: 'Selecciona si el producto tiene una promoción por cantidad',
@@ -35,26 +51,38 @@ export default config({
                     defaultValue: 'ninguna',
                 }),
                 categorias: fields.array(
-                    fields.text({ label: 'Categoría' }),
-                    { label: 'Categorías', itemLabel: props => props.value }
+                    fields.text({
+                        label: 'Categoría',
+                        validation: { isRequired: true, length: { min: 1 } }
+                    }),
+                    {
+                        label: 'Categorías (Si se deja vacío se asignará "General")',
+                        itemLabel: props => props.value || 'Categoría vacía'
+                    }
                 ),
                 subcategorias: fields.array(
                     fields.text({ label: 'Subcategoría' }),
-                    { label: 'Subcategorías', itemLabel: props => props.value }
+                    {
+                        label: 'Subcategorías (Opcional)',
+                        itemLabel: props => props.value || 'Subcategoría vacía'
+                    }
                 ),
 // Keystatic guardará las imágenes directamente en tu carpeta de assets
                 imagenPrincipal: fields.image({
-                    label: 'Imagen Principal',
+                    label: 'Imagen Principal (Si se deja vacía se usará un Placeholder automático)',
                     directory: 'src/assets/productos',
                     publicPath: '../../assets/productos/'
                 }),
                 imagenesSecundarias: fields.array(
                     fields.image({
-                    label: 'Imagen',
-                    directory: 'src/assets/productos',
-                    publicPath: '../../assets/productos/'
-                }),
-                { label: 'Galería Secundaria (Máximo 5 fotos)' }
+                        label: 'Imagen',
+                        directory: 'src/assets/productos',
+                        publicPath: '../../assets/productos/'
+                    }),
+                    {
+                        label: 'Galería Secundaria (Máximo 5 fotos)',
+                        validation: { length: { max: 5 } }
+                    }
                 ),
                 disponibilidad: fields.checkbox({ label: '¿Hay stock disponible?', defaultValue: true }),
                 destacado: fields.checkbox({ label: '¿Mostrar en el Hero de la portada?', defaultValue: false }),
@@ -77,29 +105,48 @@ export default config({
             path: 'src/content/avisos/*',
             format: { contentField: 'content' },
             schema: {
-                title: fields.slug({ name: { label: 'Título del artículo' } }),
+                title: fields.slug({
+                    name: {
+                        label: 'Título del artículo *',
+                        validation: { isRequired: true, length: { min: 1 } }
+                    }
+                }),
                 seoTitle: fields.text({ label: 'Título SEO (Opcional - para Google)' }),
-                description: fields.text({ label: 'Resumen (Descripción para tarjetas)', multiline: true }),
-                pubDate: fields.date({ label: 'Fecha de publicación' }),
+                description: fields.text({
+                    label: 'Resumen (Descripción para tarjetas) *',
+                    multiline: true,
+                    validation: { isRequired: true, length: { min: 1 } }
+                }),
+                pubDate: fields.date({
+                    label: 'Fecha de publicación *',
+                    defaultValue: { kind: 'today' },
+                    validation: { isRequired: true }
+                }),
 
                 updatedDate: fields.date({ label: 'Fecha de actualización (Opcional)' }),
                 heroImage: fields.image({
-                    label: 'Imagen de Portada',
+                    label: 'Imagen de Portada (Opcional)',
                     directory: 'src/assets/blog',
                     publicPath: '../../assets/blog/'
                 }),
             
                 author: fields.text({ label: 'Autor', defaultValue: SITE_PROPIETARIO }),
-                categoria: fields.text({ label: 'Categoría' }),
+                categoria: fields.text({ label: 'Categoría (Opcional)' }),
             
                 tags: fields.array(
                     fields.text({ label: 'Etiqueta' }),
-                    { label: 'Etiquetas', itemLabel: props => props.value }
+                    {
+                        label: 'Etiquetas (Opcional)',
+                        itemLabel: props => props.value || 'Etiqueta vacía'
+                    }
                 ),
             
                 draft: fields.checkbox({ label: 'Borrador (Ocultar al público)', defaultValue: false }),
                 destacado: fields.checkbox({ label: '¿Fijar en portada del blog?', defaultValue: false }),
-                tiempoLectura: fields.number({ label: 'Tiempo estimado de lectura (minutos)' }),
+                tiempoLectura: fields.number({
+                    label: 'Tiempo estimado de lectura en minutos (Opcional)',
+                    validation: { min: 1 }
+                }),
 
                 content: fields.mdx({
                     label: 'Contenido del artículo',
